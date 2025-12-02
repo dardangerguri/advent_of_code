@@ -4,18 +4,24 @@
 bool isInvalid(long long number) {
 	std::string nmbr = std::to_string(number);
 	size_t length = nmbr.size();
-	size_t half = 0;
-	std::string first;
-	std::string second;
+	bool pattern = true;
 
-	if (length % 2 != 0)
-		return (0);
+	for (size_t len = 1; len <= length / 2; len++) {
 
-	half = length / 2;
-	first = nmbr.substr(0, half);
-	second = nmbr.substr(half);
+		std::string part = nmbr.substr(0, len);
+		pattern = true;
 
-	return (first == second);
+		for (size_t i = len; i < length; i += len) {
+			if (nmbr.substr(i, len) != part) {
+				pattern = false;
+				break;
+			}
+		}
+
+		if (pattern)
+			return (1);
+	}
+	return (0);
 }
 
 int main() {
