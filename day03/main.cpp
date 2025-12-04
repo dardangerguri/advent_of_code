@@ -1,14 +1,15 @@
 #include <iostream>
 # include <fstream>
+# include <string>
 
 int main() {
 	std::ifstream input;
 	std::string line;
 
-	int totalJoltage = 0;
-	size_t position;
-	size_t secondPos;
-	int joltage;
+	long long totalJoltage = 0;
+	std::string selectedDigits;
+	size_t pos = 0;
+	char c;
 
 	input.open("./input.txt");
 	if (!input) {
@@ -17,24 +18,17 @@ int main() {
 	}
 
 	while (std::getline(input, line)) {
+		selectedDigits.clear();
 
-		joltage = 0;
-		for (char first = '9'; first >= '0'; first--) {
-			position = line.find(first);
-			if (position == std::string::npos || position + 1 >= line.size())
-				continue;
-			joltage = (first - '0') * 10;
+		for (pos = 0; pos < line.size(); pos++) {
+			c = line[pos];
 
-			for (char second = '9'; second >= '0'; second--) {
-				secondPos = line.find(second, position + 1);
-				if (secondPos == std::string::npos)
-					continue;
-				joltage += (second - '0');
-				break;
-			}
-			break;
+			while (!selectedDigits.empty() && selectedDigits.back() < c && selectedDigits.size() + (line.size() - pos - 1) >= 12)
+				selectedDigits.pop_back();
+			if (selectedDigits.size() < 12)
+				selectedDigits.push_back(c);
 		}
-		totalJoltage += joltage;
+		totalJoltage += std::stoll(selectedDigits);
 	}
 
 	std::cout << "The total output joltage is " << totalJoltage << std::endl;
