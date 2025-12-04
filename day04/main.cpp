@@ -5,13 +5,15 @@ int main() {
 	std::ifstream input;
 	std::string line;
 	std::vector<std::string> grid;
+	std::vector<std::pair<int,int>> toRemove;
 
-	int rollpapersAccesible = 0;
+	int totalRemoved = 0;
 	int rollpaperCount = 0;
 	int ni;
 	int nj;
 	int rowOffset[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
 	int colOffset[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+	bool removed = true;
 
 
 	input.open("./input.txt");
@@ -23,27 +25,36 @@ int main() {
 	while (std::getline(input, line))
 		grid.push_back(line);
 
-	for (size_t i = 0; i < grid.size(); i++) {
-		for (size_t j = 0; j < grid[i].size(); j++) {
-			if (grid[i][j] != '@')
-				continue;
+	while (removed) {
+		removed = false;
+		toRemove.clear();
+		for (size_t i = 0; i < grid.size(); i++) {
+			for (size_t j = 0; j < grid[i].size(); j++) {
+				if (grid[i][j] != '@')
+					continue;
 
-			rollpaperCount = 0;
-			for (int k = 0; k < 8; k++) {
-				ni = i + rowOffset[k];
-				nj = j + colOffset[k];
+				rollpaperCount = 0;
+				for (int k = 0; k < 8; k++) {
+					ni = i + rowOffset[k];
+					nj = j + colOffset[k];
 
-				if (ni >= 0 && ni < grid.size() && nj >= 0 && nj < grid[i].size())
-					if (grid[ni][nj] == '@')
-						rollpaperCount++;
+					if (ni >= 0 && ni < grid.size() && nj >= 0 && nj < grid[i].size())
+						if (grid[ni][nj] == '@')
+							rollpaperCount++;
+				}
+
+				if (rollpaperCount < 4)
+					toRemove.push_back({i, j});
 			}
-
-			if (rollpaperCount < 4)
-				rollpapersAccesible++;
+		}
+		for (auto &p : toRemove) {
+			grid[p.first][p.second] = 'x';
+			totalRemoved++;
+			removed = true;
 		}
 	}
 
-	std::cout << "The number of rollpapers that can be accessed by a forklift is " << rollpapersAccesible << std::endl;
+	std::cout << "The number of rollpapers that can be accessed by a forklift is " << totalRemoved << std::endl;
 
 	input.close();
 	return (0);
