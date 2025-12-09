@@ -13,6 +13,7 @@ int main() {
 	long rangeStart;
 	long rangeEnd;
 	long long freshCount = 0;
+	long long totalFresh = 0;
 
 	input.open("./input.txt");
 	if (!input) {
@@ -42,6 +43,12 @@ int main() {
 		else
 			mergedRanges.back().second = std::max(mergedRanges.back().second, r.second);
 	}
+
+	for (auto &r : mergedRanges) {
+		totalFresh += r.second - r.first + 1;
+	}
+
+	std::cout << "The total number of fresh ids " << totalFresh << std::endl;
 
 	for (long long id : ids) {
 		auto rangeIter = std::lower_bound(mergedRanges.begin(), mergedRanges.end(), std::make_pair(id, id));
