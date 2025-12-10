@@ -6,16 +6,15 @@ int main() {
 	std::ifstream input;
 	std::string line;
 
-	std::vector<std::vector<int>> numbersGrid;
-	std::vector<char> operators;
-	int number;
+	std::vector<std::string> lines;
+	std::string operators;
+	size_t maxLength = 0;
 
-	size_t firstChar = 0;
-	size_t rows;
-	size_t columns;
+	std::string number;
 	char op;
+	bool problemFlag = false;
+	long long nmbr = 0;
 	long long result = 0;
-
 	long long total = 0;
 
 	input.open("./input.txt");
@@ -25,40 +24,47 @@ int main() {
 	}
 
 	while (std::getline(input, line)) {
-		firstChar = line.find_first_not_of(' ');
-		if (firstChar != std::string::npos && std::isdigit(line[firstChar])) {
-			std::vector<int> row;
-			std::stringstream ss(line);
-			number = 0;
-			while (ss >> number) {
-				row.push_back(number);
+		lines.push_back(line);
+
+		if (line.length() > maxLength)
+			maxLength = line.length();
+	}
+
+	operators = lines.back();
+	lines.pop_back();
+
+	for (int col = 0; col <= maxLength - 1; col++) {
+		if (operators[col] != std::string::npos && (operators[col] == '+' || operators[col] == '*'))
+			op = operators[col];
+		number.clear();
+
+		for (size_t row = 0; row < lines.size(); row++) {
+			if (col < lines[row].size() && isdigit(lines[row][col]))
+				number += lines[row][col];
+		}
+		if (!number.empty()) {
+			nmbr = std::stoll(number);
+			if (!problemFlag) {
+				result = nmbr;
+				problemFlag = true;
+			} else {
+				if (op == '+')
+					result += nmbr;
+				else
+					result *= nmbr;
 			}
-			numbersGrid.push_back(row);
 		} else {
-			for (char c : line) {
-				if (c == '+' || c == '*')
-					operators.push_back(c);
+			if (problemFlag) {
+				total += result;
+				result = 0;
+				problemFlag = false;
 			}
 		}
 	}
-
-	rows = numbersGrid.size();
-	columns = numbersGrid[0].size();
-
-	for (size_t col = 0; col < columns; ++col) {
-		result = numbersGrid[0][col];
-		op = operators[col];
-		for (size_t row = 1; row < rows; ++row) {
-			if (op == '+')
-				result += numbersGrid[row][col];
-			else
-				result *= numbersGrid[row][col];
-		}
+	if (problemFlag)
 		total += result;
-	}
 
-	std::cout << "The grand total of all the answers is " << total << std::endl;
-
+	std::cout << "The grand total is " << total << std::endl;
 
 	input.close();
 	return (0);
