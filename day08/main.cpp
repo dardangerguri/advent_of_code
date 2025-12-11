@@ -16,11 +16,13 @@ class UnionFind {
 private:
 	std::vector<int> parent;
 	std::vector<int> size;
+	int components;
 
 public:
 	UnionFind(int n) {
 		parent.resize(n);
 		size.resize(n, 1);
+		components = n;
 		for (int i = 0; i < n; i++) {
 			parent[i] = i;
 		}
@@ -49,11 +51,12 @@ public:
 
 		parent[rootY] = rootX;
 		size[rootX] += size[rootY];
+		components--;
 		return true;
 	}
 
-	int getSize(int x) {
-		return size[find(x)];
+	int getComponents() {
+		return components;
 	}
 };
 
@@ -72,12 +75,12 @@ int main() {
 	long long dz;
 	long long d2;
 
-	int edgesToProcess;
-	int edgesProcessed;
-	int connectionsMade;
+	int lastA = -1;
+	int lastB = -1;
+	int edgesProcessed = 0;
+	int connectionsMade = 0;
 
 	long long result = 1;
-
 
 	input.open("./input.txt");
 	if (!input) {
@@ -119,32 +122,26 @@ int main() {
 
 	UnionFind uf(points.size());
 
-	edgesToProcess = 1000;
 	edgesProcessed = 0;
 	connectionsMade = 0;
 
-	for (size_t i = 0; i < edges.size() && edgesProcessed < edgesToProcess; i++) {
+	for (size_t i = 0; i < edges.size(); i++) {
 		edgesProcessed++;
 		if (uf.unite(edges[i].a, edges[i].b)) {
 			connectionsMade++;
+
+			lastA = edges[i].a;
+			lastB = edges[i].b;
+
+			if (uf.getComponents() == 1) {
+				break;
+			}
 		}
 	}
 
-	for (int i = 0; i < points.size(); i++) {
-		if (uf.find(i) == i) {
-			componentSizes.push_back(uf.getSize(i));
-		}
-	}
+	result = (long long)points[lastA].x * points[lastB].x;
 
-	std::sort(componentSizes.begin(), componentSizes.end(), [](int a, int b) {
-		return a > b;
-	});
-
-	for (int i = 0; i < 3 && i < componentSizes.size(); i++) {
-		result *= componentSizes[i];
-	}
-
-	std::cout << "Result of the three largest circuits is " << result << "\n";
+	std::cout << "Result of the two X cordinates of the last two junction boxes is " << result << "\n";
 
 	input.close();
 	return (0);
